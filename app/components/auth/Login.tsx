@@ -148,7 +148,10 @@ export default function Login({ onSwitch }: LoginProps) {
           />
           Remember me
         </label>
-        <button className="text-xs font-semibold text-[#F46A6A] hover:underline">
+        <button
+          onClick={() => router.push("/forgot-password")}
+          className="text-xs font-semibold text-[#F46A6A] hover:underline"
+        >
           Forgot Password?
         </button>
       </div>

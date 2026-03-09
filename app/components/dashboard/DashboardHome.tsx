@@ -20,6 +20,7 @@ const ITEM_ROUTES: Record<string, string> = {
   Articles: "/articles",
   "Food Recommendations": "/food-recommendations",
   Community: "/community",
+  "Symptoms Tracker": "/dashboard/symptoms",
 };
 
 interface DashboardHomeProps {

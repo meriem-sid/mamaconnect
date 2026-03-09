@@ -59,7 +59,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <a href="/" className="inline-flex items-center gap-2 mb-4 select-none">
-              <span className="text-2xl leading-none">🌸</span>
+              <img src="/logo-mamaconnect.png" alt="MamaConnect" className="w-8 h-8 object-contain" />
               <span className="font-bold text-xl text-white tracking-tight">
                 Mama<span className="text-[#F46A6A]">Connect</span>
               </span>

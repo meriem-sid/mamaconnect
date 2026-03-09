@@ -66,7 +66,7 @@ export default function Auth() {
   /* ── Midwife verification loading screen ─── */
   if (step === "midwifeVerifying") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fff5f5] via-white to-[#fdf0f0]">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-[#fff5f5] via-white to-[#fdf0f0]">
         <div className="flex flex-col items-center gap-6 px-6 text-center">
           {/* Spinner */}
           <div className="relative w-16 h-16">

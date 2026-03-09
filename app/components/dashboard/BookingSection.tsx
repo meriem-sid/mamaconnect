@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Midwife, MIDWIVES, SESSION_TYPES, getInitials } from "./data";
 import { SearchIcon, StarIcon, MapPinIcon, CheckIcon, CalendarSmIcon } from "./icons";
+import PaymentSection from "./PaymentSection";
 
 interface BookingSectionProps {
   preselectedMidwife: Midwife | null;
@@ -18,6 +19,7 @@ export default function BookingSection({ preselectedMidwife, onClearPreselected 
   const [selectedDate, setSelectedDate] = useState("");
   const [message, setMessage] = useState("");
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
 
   useEffect(() => {
     if (preselectedMidwife) {
@@ -50,6 +52,11 @@ export default function BookingSection({ preselectedMidwife, onClearPreselected 
     setSelectedDate("");
     setMessage("");
     setBookingConfirmed(false);
+    setShowPayment(false);
+  }
+
+  function goToPayment() {
+    if (selectedDate) setShowPayment(true);
   }
 
   const isInBookingFlow = bookingStep >= 2;
@@ -57,6 +64,7 @@ export default function BookingSection({ preselectedMidwife, onClearPreselected 
   return (
     <div className="max-w-6xl mx-auto px-6 sm:px-8 py-8">
       {/* Header */}
+      {!showPayment && (
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-bold text-gray-900">
@@ -77,6 +85,7 @@ export default function BookingSection({ preselectedMidwife, onClearPreselected 
           </button>
         )}
       </div>
+      )}
 
       {/* ── Browse Midwives ── */}
       {!isInBookingFlow && (
@@ -207,7 +216,7 @@ export default function BookingSection({ preselectedMidwife, onClearPreselected 
       )}
 
       {/* ── Booking Flow ── */}
-      {isInBookingFlow && !bookingConfirmed && (
+      {isInBookingFlow && !bookingConfirmed && !showPayment && (
         <div className="max-w-2xl mx-auto">
           {/* Selected Midwife Summary */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
@@ -228,6 +237,7 @@ export default function BookingSection({ preselectedMidwife, onClearPreselected 
             {[
               { step: 2, label: "Session Type" },
               { step: 3, label: "Date & Time" },
+              { step: 4, label: "Payment" },
             ].map(({ step, label }, index) => (
               <div key={step} className="flex items-center gap-2">
                 <div className="flex flex-col items-center">
@@ -238,8 +248,8 @@ export default function BookingSection({ preselectedMidwife, onClearPreselected 
                   </div>
                   <span className={`text-[10px] mt-1 ${bookingStep >= step ? "text-gray-700 font-medium" : "text-gray-500"}`}>{label}</span>
                 </div>
-                {index < 1 && (
-                  <div className={`w-16 sm:w-24 h-0.5 rounded mb-5 ${bookingStep > step ? "bg-[#F46A6A]" : "bg-gray-200"}`} />
+                {index < 2 && (
+                  <div className={`w-12 sm:w-20 h-0.5 rounded mb-5 ${bookingStep > step ? "bg-[#F46A6A]" : "bg-gray-200"}`} />
                 )}
               </div>
             ))}
@@ -338,19 +348,36 @@ export default function BookingSection({ preselectedMidwife, onClearPreselected 
                     Back
                   </button>
                   <button
-                    onClick={() => { if (selectedDate) setBookingConfirmed(true); }}
+                    onClick={goToPayment}
                     disabled={!selectedDate}
                     className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                       selectedDate ? "bg-[#F46A6A] text-white hover:bg-[#e55a5a]" : "bg-gray-200 text-gray-400 cursor-not-allowed"
                     }`}
                   >
-                    Confirm Booking
+                    Continue to Payment
                   </button>
                 </div>
               </>
             )}
           </div>
         </div>
+      )}
+
+      {/* ── Payment Step ── */}
+      {showPayment && !bookingConfirmed && bookingMidwife && (
+        <PaymentSection
+          paymentDetails={{
+            midwife: bookingMidwife,
+            sessionType: SESSION_TYPES.find((s) => s.value === selectedSession)?.label || selectedSession,
+            date: selectedDate,
+            message,
+          }}
+          onBack={() => setShowPayment(false)}
+          onPaymentComplete={() => {
+            setShowPayment(false);
+            setBookingConfirmed(true);
+          }}
+        />
       )}
 
       {/* ── Booking Confirmation ── */}
@@ -361,9 +388,9 @@ export default function BookingSection({ preselectedMidwife, onClearPreselected 
               <polyline points="20 6 9 17 4 12" />
             </svg>
           </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">Booking Confirmed!</h3>
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">Payment Successful!</h3>
           <p className="text-gray-500 mb-6">
-            Your {SESSION_TYPES.find((s) => s.value === selectedSession)?.label} with <strong>{bookingMidwife?.name}</strong> has been scheduled.
+            Your {SESSION_TYPES.find((s) => s.value === selectedSession)?.label} with <strong>{bookingMidwife?.name}</strong> has been booked and paid for.
           </p>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6 text-left">
             <div className="space-y-2 text-sm">

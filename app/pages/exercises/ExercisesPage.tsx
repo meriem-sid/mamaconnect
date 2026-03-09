@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const TRIMESTERS = ["All", "1st Trimester", "2nd Trimester", "3rd Trimester"];
 
@@ -108,6 +109,7 @@ const EXERCISES = [
 ];
 
 export default function ExercisesPage() {
+  const router = useRouter();
   const [activeTrimester, setActiveTrimester] = useState("All");
 
   const filtered = EXERCISES.filter(
@@ -122,18 +124,18 @@ export default function ExercisesPage() {
 
   return (
     <>
-      {/* Back to Dashboard */}
+      {/* Back */}
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <a
-            href="/dashboard"
+          <button
+            onClick={() => router.back()}
             className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-[#F46A6A] transition-colors duration-200"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6" />
             </svg>
-            Back to Dashboard
-          </a>
+            Back
+          </button>
         </div>
       </div>
 
@@ -219,7 +221,7 @@ export default function ExercisesPage() {
                   className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
                 >
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center text-2xl shadow-md flex-shrink-0">
+                    <div className="w-14 h-14 rounded-xl bg-linear-to-br from-violet-400 to-purple-500 flex items-center justify-center text-2xl shadow-md shrink-0">
                       {ex.emoji}
                     </div>
                     <div className="flex-1">
@@ -248,11 +250,11 @@ export default function ExercisesPage() {
 
                   <div className="pt-3 border-t border-gray-100 space-y-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-gray-500 w-16 flex-shrink-0">Duration</span>
+                      <span className="text-xs font-semibold text-gray-500 w-16 shrink-0">Duration</span>
                       <span className="text-xs text-gray-700 font-medium">{ex.duration}</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="text-xs font-semibold text-gray-500 w-16 flex-shrink-0 pt-0.5">Tip</span>
+                      <span className="text-xs font-semibold text-gray-500 w-16 shrink-0 pt-0.5">Tip</span>
                       <span className="text-xs text-gray-500 leading-relaxed">{ex.tips}</span>
                     </div>
                   </div>
@@ -271,7 +273,7 @@ export default function ExercisesPage() {
       {/* CTA */}
       <section className="bg-white py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl p-8 sm:p-12 text-center">
+          <div className="bg-linear-to-br from-rose-50 to-pink-50 rounded-2xl p-8 sm:p-12 text-center">
             <span className="inline-block text-xs font-semibold tracking-wider uppercase text-[#F46A6A] bg-white/70 px-3 py-1 rounded-full mb-3">
               Your Wellness Plan
             </span>

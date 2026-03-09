@@ -71,7 +71,7 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
         <a href={user ? "/dashboard" : "/"} className="flex items-center gap-2 select-none">
-          <span className="text-2xl leading-none">🌸</span>
+          <img src="/logo-mamaconnect.png" alt="MamaConnect" className="w-8 h-8 object-contain" />
           <span className="font-bold text-xl text-gray-900 tracking-tight">
             Mama<span className="text-[#F46A6A]">Connect</span>
           </span>

@@ -123,7 +123,7 @@ export default function AdminDashboard() {
             <h3 className="font-semibold text-gray-900 text-base mb-1">User Growth</h3>
             <p className="text-sm text-gray-500">Monthly registration trends</p>
           </div>
-          <div className="h-[280px]">
+          <div className="h-70">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={userGrowthData}>
                 <defs>
@@ -161,7 +161,7 @@ export default function AdminDashboard() {
             <h3 className="font-semibold text-gray-900 text-base mb-1">Article Activity</h3>
             <p className="text-sm text-gray-500">Published vs draft articles</p>
           </div>
-          <div className="h-[280px]">
+          <div className="h-70">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={articleActivityData} barGap={4}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />

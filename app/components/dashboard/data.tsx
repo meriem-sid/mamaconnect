@@ -14,13 +14,15 @@ import {
   ShopIcon,
   ChatIcon,
   FoodIcon,
+  SymptomsIcon,
+  SymptomsNavIcon,
 } from "./icons";
 
 /* ═══════════════════════════════════════════════════════════
    TYPES
    ═══════════════════════════════════════════════════════════ */
 
-export type TabKey = "home" | "monitoring" | "booking" | "shop" | "chat" | "timeline";
+export type TabKey = "home" | "monitoring" | "booking" | "shop" | "chat" | "timeline" | "symptoms";
 
 export interface Midwife {
   id: number;
@@ -67,6 +69,7 @@ export const SERVICE_ITEMS = [
   { icon: "book", label: "Articles", desc: "Weekly guides & tips", color: "from-amber-400 to-orange-500" },
   { icon: "food", label: "Food Recommendations", desc: "Healthy meal suggestions for pregnancy.", color: "from-emerald-400 to-teal-500" },
   { icon: "community", label: "Community", desc: "Connect with other mamas", color: "from-pink-400 to-rose-500" },
+  { icon: "symptoms", label: "Symptoms Tracker", desc: "Log & track how you feel daily", color: "from-fuchsia-400 to-purple-500" },
 ];
 
 export const serviceIcons: Record<string, React.ReactNode> = {
@@ -76,6 +79,7 @@ export const serviceIcons: Record<string, React.ReactNode> = {
   book: <BookOpenIcon />,
   food: <FoodIcon />,
   community: <UsersIcon />,
+  symptoms: <SymptomsIcon />,
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -135,28 +139,19 @@ export const SESSION_TYPES: SessionType[] = [
 
 export const SHOP_PLANS = [
   {
-    name: "Basic",
-    price: "12,900",
-    period: "/ month",
-    desc: "Essential monitoring for healthy pregnancies",
-    features: ["Weekly health reports", "Basic exercise guides", "Community access", "Article library", "Email support"],
-    popular: false,
-  },
-  {
-    name: "Standard",
+    name: "Premium",
     price: "18,900",
     period: "/ month",
-    desc: "Complete care for peace of mind",
-    features: ["Everything in Basic", "Wearable device integration", "Real-time alerts", "2 midwife consultations/mo", "Priority support", "Nutrition planning"],
-    popular: true,
-  },
-  {
-    name: "Premium",
-    price: "29,900",
-    period: "/ month",
     desc: "Full-spectrum premium maternal care",
-    features: ["Everything in Standard", "Unlimited consultations", "Dedicated care coordinator", "Emergency hotline 24/7", "Partner access", "Birth plan assistance", "Postpartum support"],
-    popular: false,
+    features: [
+      "Everything from the Free plan, plus:",
+      "Wearable device integration",
+      "Real-time alerts",
+      "Unlimited AI chatbot requests",
+      "Personalized meal plans",
+      "Personalized workout plans",
+    ],
+    popular: true,
   },
 ];
 
@@ -181,13 +176,14 @@ export const USER_PROFILE = {
    SIDEBAR TABS
    ═══════════════════════════════════════════════════════════ */
 
-export const SIDEBAR_TABS: { key: TabKey; label: string; icon: React.ReactNode }[] = [
+export const SIDEBAR_TABS: { key: TabKey; label: string; icon: React.ReactNode; href?: string }[] = [
   { key: "home", label: "Dashboard", icon: <DashboardIcon /> },
   { key: "timeline", label: "Pregnancy Timeline", icon: <CalendarIcon /> },
   { key: "monitoring", label: "Monitoring", icon: <MonitorIcon /> },
   { key: "booking", label: "Booking", icon: <CalendarIcon /> },
   { key: "shop", label: "Shop", icon: <ShopIcon /> },
   { key: "chat", label: "Chat", icon: <ChatIcon /> },
+  { key: "symptoms", label: "Symptoms Tracker", icon: <SymptomsNavIcon />, href: "/dashboard/symptoms" },
 ];
 
 /* ═══════════════════════════════════════════════════════════

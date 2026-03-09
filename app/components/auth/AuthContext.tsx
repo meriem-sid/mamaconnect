@@ -8,6 +8,7 @@ interface AuthUser {
   phone: string;
   role: "client" | "midwife";
   status: "active" | "pending";
+  plan: "free" | "premium";
 }
 
 interface AuthContextValue {
@@ -16,6 +17,7 @@ interface AuthContextValue {
   login: (email: string) => void;
   signup: (name: string, email: string, phone: string, role: "client" | "midwife", status?: "active" | "pending") => void;
   logout: () => void;
+  upgradePlan: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -30,7 +32,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        setUser(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        // Ensure existing stored users get a default plan
+        if (!parsed.plan) parsed.plan = "free";
+        setUser(parsed);
       }
     } catch {
       // ignore parse errors
@@ -39,15 +44,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   function login(email: string) {
-    const authUser: AuthUser = { name: email.split("@")[0], email, phone: "", role: "client", status: "active" };
+    const authUser: AuthUser = { name: email.split("@")[0], email, phone: "", role: "client", status: "active", plan: "free" };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(authUser));
     setUser(authUser);
   }
 
   function signup(name: string, email: string, phone: string, role: "client" | "midwife", status: "active" | "pending" = "active") {
-    const authUser: AuthUser = { name, email, phone, role, status };
+    const authUser: AuthUser = { name, email, phone, role, status, plan: "free" };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(authUser));
     setUser(authUser);
+  }
+
+  function upgradePlan() {
+    if (!user) return;
+    const updated = { ...user, plan: "premium" as const };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    setUser(updated);
   }
 
   function logout() {
@@ -56,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, upgradePlan }}>
       {children}
     </AuthContext.Provider>
   );

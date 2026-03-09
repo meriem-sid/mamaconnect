@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter, usePathname } from "next/navigation";
 import {
   TabKey,
   SIDEBAR_TABS,
@@ -14,12 +15,28 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ activeTab, onTabChange, userName, userEmail }: SidebarProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  function handleTabClick(tab: typeof SIDEBAR_TABS[number]) {
+    if (tab.href) {
+      router.push(tab.href);
+    } else {
+      onTabChange(tab.key);
+    }
+  }
+
+  function isTabActive(tab: typeof SIDEBAR_TABS[number]) {
+    if (tab.href) return pathname === tab.href;
+    return activeTab === tab.key && pathname === "/dashboard";
+  }
+
   return (
     <aside className="fixed top-0 left-0 bottom-0 w-64 bg-white border-r border-gray-200 flex flex-col z-40">
       {/* Logo */}
       <div className="h-16 flex items-center px-6 border-b border-gray-100 shrink-0">
         <a href="/" className="flex items-center gap-2 select-none">
-          <span className="text-2xl leading-none">🌸</span>
+          <img src="/logo-mamaconnect.png" alt="MamaConnect" className="w-8 h-8 object-contain" />
           <span className="font-bold text-xl text-gray-900 tracking-tight">
             Mama<span className="text-[#F46A6A]">Connect</span>
           </span>
@@ -31,14 +48,14 @@ export default function Sidebar({ activeTab, onTabChange, userName, userEmail }:
         {SIDEBAR_TABS.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => onTabChange(tab.key)}
+            onClick={() => handleTabClick(tab)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${
-              activeTab === tab.key
+              isTabActive(tab)
                 ? "bg-[#F46A6A] text-white shadow-md shadow-[#F46A6A]/20"
                 : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
             }`}
           >
-            <span className={activeTab === tab.key ? "text-white" : "text-gray-400"}>{tab.icon}</span>
+            <span className={isTabActive(tab) ? "text-white" : "text-gray-400"}>{tab.icon}</span>
             {tab.label}
           </button>
         ))}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/components/auth/AuthContext";
 import { TabKey, Midwife } from "@/app/components/dashboard/data";
 import Sidebar from "@/app/components/dashboard/Sidebar";
@@ -15,7 +15,9 @@ import ChatSection from "@/app/components/dashboard/ChatSection";
 import TrackerSection from "@/app/components/dashboard/TrackerSection";
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<TabKey>("home");
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams.get("tab") as TabKey) || "home";
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
   const [greeting, setGreeting] = useState("Good morning");
   const { user, isLoading, logout } = useAuth();
   const router = useRouter();
@@ -86,7 +88,7 @@ export default function DashboardPage() {
             />
           )}
           {activeTab === "shop" && <ShopSection />}
-          {activeTab === "chat" && <ChatSection />}
+          {activeTab === "chat" && <ChatSection onGoToShop={() => setActiveTab("shop")} />}
           {activeTab === "timeline" && <TrackerSection />}
         </main>
       </div>

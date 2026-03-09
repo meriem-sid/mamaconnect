@@ -314,3 +314,29 @@ export function FoodIcon() {
     </svg>
   );
 }
+
+/* 28×28 — used in Quick Access service card */
+export function SymptomsIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+      <rect x="9" y="3" width="6" height="4" rx="1" />
+      <path d="M9 12h6" />
+      <path d="M9 16h4" />
+      <path d="M12 12v4" />
+    </svg>
+  );
+}
+
+/* 20×20 — used in the sidebar nav */
+export function SymptomsNavIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+      <rect x="9" y="3" width="6" height="4" rx="1" />
+      <path d="M9 12h6" />
+      <path d="M9 16h4" />
+      <path d="M12 12v4" />
+    </svg>
+  );
+}

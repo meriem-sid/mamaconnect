@@ -55,7 +55,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Brand - matching app logo pattern */}
         <div className="flex items-center justify-between px-6 h-16 border-b border-gray-100">
           <Link href="/admin" className="flex items-center gap-2">
-            <span className="text-xl">🌸</span>
+            <img src="/logo-mamaconnect.png" alt="MamaConnect" className="w-7 h-7 object-contain" />
             <span className="font-bold text-xl text-gray-900">
               Mama<span className="text-[#F46A6A]">Connect</span>
             </span>

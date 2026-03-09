@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useAuth } from "@/app/components/auth/AuthContext";
 import ChatMessage from "@/app/components/chat/ChatMessage";
 import ChatInput from "@/app/components/chat/ChatInput";
 
@@ -10,6 +11,15 @@ interface Message {
   isUser: boolean;
   timestamp: string;
 }
+
+const FREE_SUGGESTIONS = [
+  "Pregnancy nutrition tips",
+  "Exercises during pregnancy",
+  "Common pregnancy symptoms",
+  "Mental health during pregnancy",
+];
+
+const FREE_MAX_INTERACTIONS = 3;
 
 const EXAMPLE_PROMPTS = [
   "What foods should I avoid during pregnancy?",
@@ -33,16 +43,24 @@ const AI_RESPONSES: Record<string, string> = {
     "Key supplements during pregnancy include folic acid (especially in the first trimester), iron, calcium, vitamin D, and omega-3 fatty acids. Your prenatal vitamin should cover most of these. Always check with your healthcare provider about the right dosage for your needs.",
   weight:
     "Healthy weight gain during pregnancy varies based on your pre-pregnancy BMI. Generally, 11-16kg is recommended for those with a normal BMI. Your healthcare provider can give you personalised guidance based on your individual situation.",
+  nutrition:
+    "Good nutrition during pregnancy is essential for your baby's development. Focus on iron-rich foods (spinach, lean red meat), calcium (dairy, fortified plant milk), folate (leafy greens, legumes), and omega-3s (salmon, walnuts). Eat small, frequent meals and stay well-hydrated with at least 8 glasses of water daily.",
+  symptoms:
+    "Common pregnancy symptoms include nausea, fatigue, breast tenderness, frequent urination, and mood swings — especially in the first trimester. As pregnancy progresses you may experience back pain, swelling, and heartburn. Most symptoms are normal, but always contact your healthcare provider if something feels concerning.",
+  mental:
+    "Mental health during pregnancy is just as important as physical health. It's normal to feel anxious, emotional, or overwhelmed. Try mindfulness exercises, gentle physical activity, and talking openly with your partner or a trusted friend. If you experience persistent sadness or anxiety, please reach out to a mental health professional — support is available and you deserve it.",
 };
 
 function getAIResponse(message: string): string {
   const lower = message.toLowerCase();
-  if (lower.includes("food") || lower.includes("eat") || lower.includes("avoid")) return AI_RESPONSES.food;
+  if (lower.includes("nutrition") || lower.includes("food") || lower.includes("eat") || lower.includes("avoid")) return AI_RESPONSES.nutrition;
   if (lower.includes("morning") || lower.includes("nausea") || lower.includes("sick")) return AI_RESPONSES.morning;
   if (lower.includes("week")) return AI_RESPONSES.week;
   if (lower.includes("exercise") || lower.includes("active") || lower.includes("workout")) return AI_RESPONSES.exercise;
   if (lower.includes("vitamin") || lower.includes("supplement")) return AI_RESPONSES.vitamin;
   if (lower.includes("weight") || lower.includes("gain")) return AI_RESPONSES.weight;
+  if (lower.includes("symptom")) return AI_RESPONSES.symptoms;
+  if (lower.includes("mental") || lower.includes("anxiety") || lower.includes("depress") || lower.includes("stress")) return AI_RESPONSES.mental;
   return AI_RESPONSES.default;
 }
 
@@ -50,7 +68,10 @@ function getTimestamp(): string {
   return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-export default function ChatSection() {
+export default function ChatSection({ onGoToShop }: { onGoToShop?: () => void }) {
+  const { user } = useAuth();
+  const isPremium = user?.plan === "premium";
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
@@ -61,6 +82,7 @@ export default function ChatSection() {
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [freeInteractions, setFreeInteractions] = useState(0);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -70,20 +92,27 @@ export default function ChatSection() {
     }
   }, [messages, isTyping]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const freeExhausted = !isPremium && freeInteractions >= FREE_MAX_INTERACTIONS;
+
+  const sendMessage = (text: string) => {
+    if (!text.trim()) return;
+    if (!isPremium && freeInteractions >= FREE_MAX_INTERACTIONS) return;
 
     const userMessage: Message = {
       id: Date.now(),
-      text: input.trim(),
+      text: text.trim(),
       isUser: true,
       timestamp: getTimestamp(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    const userText = input.trim();
+    const userText = text.trim();
     setInput("");
     setIsTyping(true);
+
+    if (!isPremium) {
+      setFreeInteractions((prev) => prev + 1);
+    }
 
     setTimeout(() => {
       const aiMessage: Message = {
@@ -97,16 +126,37 @@ export default function ChatSection() {
     }, 1500);
   };
 
+  const handleSend = () => {
+    sendMessage(input);
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    sendMessage(suggestion);
+  };
+
   const handlePromptClick = (prompt: string) => {
-    setInput(prompt);
+    if (isPremium) {
+      setInput(prompt);
+    } else {
+      sendMessage(prompt);
+    }
   };
 
   return (
     <div className="p-6 sm:p-8">
       {/* Page header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">AI Assistant</h1>
-        <p className="text-sm text-gray-500 mt-1">Ask any pregnancy-related question and get supportive, helpful answers.</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">AI Assistant</h1>
+            <p className="text-sm text-gray-500 mt-1">Ask any pregnancy-related question and get supportive, helpful answers.</p>
+          </div>
+          {!isPremium && (
+            <span className="text-xs text-gray-400 font-medium bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+              {freeInteractions}/{FREE_MAX_INTERACTIONS} free
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
@@ -167,9 +217,44 @@ export default function ChatSection() {
             )}
           </div>
 
-          {/* Input area */}
+          {/* Input area — differs by plan */}
           <div className="px-5 pt-3 pb-3 border-t border-gray-100">
-            <ChatInput value={input} onChange={setInput} onSend={handleSend} />
+            {isPremium ? (
+              <ChatInput value={input} onChange={setInput} onSend={handleSend} />
+            ) : freeExhausted ? (
+              /* Free user exhausted all interactions */
+              <div className="text-center py-2">
+                <p className="text-sm text-gray-500 mb-3">
+                  You&apos;ve used all <span className="font-semibold">{FREE_MAX_INTERACTIONS} free</span> AI interactions.
+                </p>
+                <button
+                  onClick={onGoToShop}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#F46A6A] text-white text-sm font-semibold rounded-full hover:bg-[#e55d5d] active:bg-[#d45252] transition-colors cursor-pointer"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                  Upgrade to Premium
+                </button>
+              </div>
+            ) : (
+              /* Free user — suggestion buttons only */
+              <div>
+                <p className="text-xs text-gray-400 mb-2.5">Choose a topic to ask about:</p>
+                <div className="flex flex-wrap gap-2">
+                  {FREE_SUGGESTIONS.map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      onClick={() => handleSuggestionClick(suggestion)}
+                      disabled={isTyping}
+                      className="text-xs text-gray-600 bg-gray-50 hover:bg-rose-50 hover:text-[#F46A6A] border border-gray-200 hover:border-[#F46A6A]/30 px-3.5 py-2 rounded-full transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -200,7 +285,8 @@ export default function ChatSection() {
                 <button
                   key={prompt}
                   onClick={() => handlePromptClick(prompt)}
-                  className="w-full text-left text-xs text-gray-600 bg-gray-50 hover:bg-rose-50 hover:text-[#F46A6A] px-3 py-2.5 rounded-xl transition-all duration-200 cursor-pointer"
+                  disabled={freeExhausted || isTyping}
+                  className="w-full text-left text-xs text-gray-600 bg-gray-50 hover:bg-rose-50 hover:text-[#F46A6A] px-3 py-2.5 rounded-xl transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   &ldquo;{prompt}&rdquo;
                 </button>
@@ -208,15 +294,35 @@ export default function ChatSection() {
             </div>
           </div>
 
-          {/* Tips */}
-          <div className="bg-rose-50 rounded-2xl p-6">
-            <h3 className="font-semibold text-gray-900 text-sm mb-2">💡 Tips</h3>
-            <ul className="space-y-2 text-xs text-gray-600 leading-relaxed">
-              <li>• Ask specific questions for better answers</li>
-              <li>• Mention your trimester for tailored advice</li>
-              <li>• Always consult your doctor for medical decisions</li>
-            </ul>
-          </div>
+          {/* Tips or Upgrade CTA */}
+          {isPremium ? (
+            <div className="bg-rose-50 rounded-2xl p-6">
+              <h3 className="font-semibold text-gray-900 text-sm mb-2">💡 Tips</h3>
+              <ul className="space-y-2 text-xs text-gray-600 leading-relaxed">
+                <li>• Ask specific questions for better answers</li>
+                <li>• Mention your trimester for tailored advice</li>
+                <li>• Always consult your doctor for medical decisions</li>
+              </ul>
+            </div>
+          ) : (
+            <div className="bg-linear-to-br from-[#fff5f5] to-[#fdf0f0] rounded-2xl p-6 border border-[#F46A6A]/10">
+              <div className="flex items-center gap-2 mb-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F46A6A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+                <h3 className="font-semibold text-gray-900 text-sm">Upgrade to Premium</h3>
+              </div>
+              <p className="text-xs text-gray-600 leading-relaxed mb-3">
+                Get unlimited AI conversations, type your own questions, and receive personalised pregnancy guidance.
+              </p>
+              <button
+                onClick={onGoToShop}
+                className="inline-block text-xs font-semibold text-[#F46A6A] hover:underline cursor-pointer"
+              >
+                Learn more →
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

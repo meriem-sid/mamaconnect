@@ -74,7 +74,7 @@ export default function DownloadSection() {
                   {/* App mockup */}
                   <div className="px-4 py-4 space-y-3">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-base">🌸</span>
+                      <img src="/logo-mamaconnect.png" alt="MamaConnect" className="w-5 h-5 object-contain" />
                       <span className="text-xs font-bold text-gray-900">MamaConnect</span>
                     </div>
                     <div className="bg-white rounded-xl p-3 shadow-sm space-y-2">

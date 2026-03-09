@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { TabKey, SIDEBAR_TABS, ALERTS, alertStyles, getInitials } from "./data";
 import { BellIcon } from "./icons";
 import ProfileDropdown from "./ProfileDropdown";
@@ -14,6 +14,7 @@ interface HeaderBarProps {
 export default function HeaderBar({ activeTab, user, onLogout }: HeaderBarProps) {
   const [profileOpen, setProfileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [hasUnread, setHasUnread] = useState(true);
   const profileRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
@@ -30,7 +31,19 @@ export default function HeaderBar({ activeTab, user, onLogout }: HeaderBarProps)
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const criticalCount = ALERTS.filter((a) => a.type === "critical").length;
+  // Mark all notifications as read when the panel is opened
+  const handleToggleNotif = useCallback(() => {
+    setNotifOpen((v) => {
+      const next = !v;
+      if (next) {
+        setHasUnread(false);
+      }
+      return next;
+    });
+    setProfileOpen(false);
+  }, []);
+
+  const unreadCount = ALERTS.length;
 
   return (
     <header className="sticky top-0 z-30 h-16 bg-white/80 backdrop-blur-md border-b border-gray-200 flex items-center justify-between px-6 sm:px-8">
@@ -44,13 +57,13 @@ export default function HeaderBar({ activeTab, user, onLogout }: HeaderBarProps)
         {/* Notification Bell */}
         <div className="relative" ref={notifRef}>
           <button
-            onClick={() => { setNotifOpen((v) => !v); setProfileOpen(false); }}
+            onClick={handleToggleNotif}
             className="relative w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors cursor-pointer"
           >
             <BellIcon />
-            {criticalCount > 0 && (
+            {hasUnread && (
               <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#F46A6A] rounded-full text-white text-[10px] font-bold flex items-center justify-center">
-                {criticalCount}
+                {unreadCount}
               </span>
             )}
           </button>
@@ -63,9 +76,9 @@ export default function HeaderBar({ activeTab, user, onLogout }: HeaderBarProps)
                   <p className="text-sm font-bold text-gray-900">Notifications</p>
                   <p className="text-xs text-gray-400">{ALERTS.length} alerts today</p>
                 </div>
-                {criticalCount > 0 && (
+                {ALERTS.filter((a) => a.type === "critical").length > 0 && (
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 uppercase tracking-wider">
-                    {criticalCount} critical
+                    {ALERTS.filter((a) => a.type === "critical").length} critical
                   </span>
                 )}
               </div>

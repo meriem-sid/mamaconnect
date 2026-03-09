@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const RECOMMENDED_MEALS = [
   {
@@ -144,6 +144,7 @@ const DAILY_TIPS = [
 ];
 
 export default function FoodRecommendations() {
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -154,12 +155,12 @@ export default function FoodRecommendations() {
         <div className="absolute top-10 right-10 w-64 h-64 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-16 -left-16 w-72 h-72 bg-teal-200/20 rounded-full blur-3xl pointer-events-none" />
         <div className="relative max-w-6xl mx-auto px-6 sm:px-8">
-          <Link
-            href="/dashboard"
+          <button
+            onClick={() => router.back()}
             className="inline-flex items-center gap-2 text-sm font-medium text-emerald-700 hover:text-emerald-900 mb-6 transition-colors"
           >
-            ← Back to Dashboard
-          </Link>
+            ← Back
+          </button>
           <div className="flex items-center gap-4 mb-4">
             <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-emerald-400 to-teal-500 text-white flex items-center justify-center text-2xl shadow-lg shadow-emerald-400/30">
               🥗
